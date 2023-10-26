@@ -1,0 +1,1 @@
+open_api_key='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'
