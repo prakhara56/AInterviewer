@@ -1,0 +1,12 @@
+langchain
+openai
+streamlit==1.25.0
+nltk
+streamlit-option-menu
+dataclasses
+PyPDF2
+typing
+Literal
+apiKeys
+nltk
+os
