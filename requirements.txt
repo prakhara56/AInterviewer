@@ -6,7 +6,4 @@ streamlit-option-menu
 dataclasses
 PyPDF2
 typing
-Literal
-apiKeys
-nltk
 os
