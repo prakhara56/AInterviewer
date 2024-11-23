@@ -1,5 +1,6 @@
 from langchain_openai import AzureChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_mistralai import ChatMistralAI
 import streamlit as st
 
 
@@ -52,6 +53,15 @@ class LLMClients:
                 initialized_clients["Gemini"] = gemini_client
             except Exception as e:
                 st.error(f"Failed to initialize Google Gemini: {e}")
+        if "MISTRAL_API_KEY" in secrets:
+            try:
+                mistral_client = ChatMistralAI(
+                    model="mistral-large-latest",
+                    api_key=secrets["MISTRAL_API_KEY"],
+                )
+                initialized_clients["MistralAI"] = mistral_client
+            except Exception as e:
+                st.error(f"Failed to initialize Mistral: {e}")
 
         # Warn if no LLMs are initialized
         if not initialized_clients:

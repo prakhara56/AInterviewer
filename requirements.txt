@@ -1,7 +1,7 @@
 langchain
 langchain_openai
 langchain_google_genai
-openai
+langchain_mistralai
 streamlit
 streamlit-option-menu
 PyPDF2
