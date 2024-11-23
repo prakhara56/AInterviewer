@@ -16,8 +16,9 @@ class BaseChatbot:
             llm_clients (dict): Dictionary of available LLM clients.
         """
         self.llm_clients = llm_clients
+        self.valid_llms = list(llm_clients.keys())
         self.current_client = None
-        SessionManager.initialize()
+        SessionManager.initialize(self.valid_llms)
 
     def process_user_input(self, prompt):
         """
@@ -58,7 +59,7 @@ class BaseChatbot:
         self.current_client = self.llm_clients[st.session_state.selected_llm]
 
         # Render sidebar and chat history
-        ChatUI.render_sidebar()
+        ChatUI.render_sidebar(self.valid_llms)
         ChatUI.render_chat_history()
 
         # Chat input section

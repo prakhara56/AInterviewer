@@ -1,16 +1,17 @@
 from langchain_openai import AzureChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
+import streamlit as st
 
 
 class LLMClients:
     """
-    Initializes and manages different LLM clients for use in the chatbot.
+    Manages the initialization and validation of LLM clients based on available secrets.
     """
 
     @staticmethod
     def initialize_clients(secrets):
         """
-        Initialize Azure OpenAI and Google Gemini clients.
+        Initialize valid LLM clients based on available secrets.
 
         Args:
             secrets (dict): Secret keys and configurations for LLMs.
@@ -18,16 +19,42 @@ class LLMClients:
         Returns:
             dict: A dictionary of initialized LLM clients.
         """
-        azure_client = AzureChatOpenAI(
-            azure_deployment=secrets["AZURE_OPENAI_DEPLOYMENT_NAME"],
-            azure_endpoint=secrets["AZURE_OPENAI_ENDPOINT"],
-            api_version=secrets["AZURE_OPENAI_VERSION"],
-            api_key=secrets["AZURE_OPENAI_API_KEY"],
-        )
+        initialized_clients = {}
 
-        gemini_client = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
-            api_key=secrets["GOOGLE_API_KEY"],
-        )
+        # Check and initialize Azure OpenAI if secrets are available
+        if all(
+            key in secrets
+            for key in [
+                "AZURE_OPENAI_DEPLOYMENT_NAME",
+                "AZURE_OPENAI_ENDPOINT",
+                "AZURE_OPENAI_VERSION",
+                "AZURE_OPENAI_API_KEY",
+            ]
+        ):
+            try:
+                azure_client = AzureChatOpenAI(
+                    azure_deployment=secrets["AZURE_OPENAI_DEPLOYMENT_NAME"],
+                    azure_endpoint=secrets["AZURE_OPENAI_ENDPOINT"],
+                    api_version=secrets["AZURE_OPENAI_VERSION"],
+                    api_key=secrets["AZURE_OPENAI_API_KEY"],
+                )
+                initialized_clients["OpenAI"] = azure_client
+            except Exception as e:
+                st.error(f"Failed to initialize Azure OpenAI: {e}")
 
-        return {"OpenAI": azure_client, "Gemini": gemini_client}
+        # Check and initialize Google Gemini if secrets are available
+        if "GOOGLE_API_KEY" in secrets:
+            try:
+                gemini_client = ChatGoogleGenerativeAI(
+                    model="gemini-1.5-flash",
+                    api_key=secrets["GOOGLE_API_KEY"],
+                )
+                initialized_clients["Gemini"] = gemini_client
+            except Exception as e:
+                st.error(f"Failed to initialize Google Gemini: {e}")
+
+        # Warn if no LLMs are initialized
+        if not initialized_clients:
+            st.warning("No LLMs were initialized. Please check your secrets configuration.")
+
+        return initialized_clients
